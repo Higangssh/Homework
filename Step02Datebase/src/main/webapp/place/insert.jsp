@@ -34,7 +34,7 @@
 		<%if(isSuccess){ %>
 			<p class ="alert alert-success">
 				<strong><%=name%></strong> 님정보를 추가했습니다.
-				<a class ="alert-link" href="${pageContext.request.contextPath}/place/list2.jsp">목록보기</a>
+				<a class ="alert-link" href="${pageContext.request.contextPath}/place/list.jsp">목록보기</a>
 			</p>
 		<%}else{ %>
 			<p class="alert alert-danger">

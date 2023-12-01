@@ -1,18 +1,17 @@
-<%@page import="java.lang.reflect.Array"%>
-<%@page import="java.util.List"%>
 <%@page import="test.place.dao.PlaceDao"%>
 <%@page import="test.place.dto.PlaceDto"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
 <%
-	List<PlaceDto> list = PlaceDao.getInstance().getList();
+	int num = Integer.parseInt(request.getParameter("num"));
+	PlaceDto dto = PlaceDao.getInstance().getData(num);
 	
 %>
 <!DOCTYPE html>
 <html>
 <head>
 <meta charset="UTF-8">
-<title>/member/insertform.jsp</title>
+<title>Insert title here</title>
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
 </head>
@@ -54,41 +53,35 @@
 		<nav>
 			<ol class="breadcrumb">
 				<li class="breadcrumb-item"><a href="../index.jsp">Home</a></li>
-				<li class="breadcrumb-item"><a href="list.jsp">맛집목록</a></li>
-				<li class="breadcrumb-item active">맛집추가</li>
+				<li class="breadcrumb-item"><a href="list2.jsp">회원목록</a></li>
+				<li class="breadcrumb-item active">회원수정</li>
 			</ol>
 		</nav>
-		<h1>맛집 추가 양식</h1>
-		<form action="${pageContext.request.contextPath}/place/insert.jsp" method="post">
+		<h1>회원정부 수정 양식</h1>
+		<form action="update.jsp" method="post">
 			<div class="mb-2">
-				<label class="form-label" for="num">가게일련번호</label>
-			<input class="form-control" type="text" name="num" id="num" />
-			<div class="mb-2">
-				<label class="form-label" for="name">맛집이름</label>
-				<input class="form-control" type="text" name="name" id="name"/>
-			</div>		
-			<div class="mb-2">
-				<label class="form-label" for="addr">주소</label>
-				<input class="form-control" type="text" name="addr" id="addr"/>
+				<label class="form-label" for="num">번호</label>
+				<input class="form-control" type="text" id="num" name="num" value="<%=dto.getNum()%>" readonly />
+				<div class="form-text">본인의 번호을 입력하세요!</div>
 			</div>
 			<div class="mb-2">
-				<label class="form-label" for="score">평점</label>
-				<input class="form-control" type="text" name="score" id="score"/>
-			</div>	
-			<button class="btn btn-primary" type="submit">제출</button>
+				<label class="form-label" for="name">이름</label>
+				<input class="form-control"  type="text" id="name" name="name" value="<%=dto.getName() %>" />
+				<div class="form-text">본인의 이름을 입력하세요!</div>
+			</div>
+			<div class="mb-2">
+				<label class="form-label" for="addr">주소</label>
+				<input class="form-control" type="text" id="addr" name="addr" value="<%=dto.getAddr() %>" />
+				<div class="form-text">본인의 주소를 입력하세요!</div>
+			</div>
+				<div class="mb-2">
+				<label class="form-label" for="score">점수</label>
+				<input class="form-control" type="text" id="score" name="score" value="<%=dto.getScore() %>" />
+				<div class="form-text">본인의 주소를 입력하세요!</div>
+			</div>
+			<button class="btn btn-outline-primary" type="submit">수정확인</button>
+			<button class="btn btn-outline-danger" type="reset">취소</button>
 		</form>
-		<table>
-				<tr>
-					<th>이미 있는 일련번호</th>
-				</tr>
-				<tr>
-					<% for(PlaceDto tmp :list){%>
-					<tr>
-						<td><%=tmp.getNum() %></td>
-					</tr>
-					<% }%>
-				</tr>
-		</table>
 	</div>
 	<jsp:include page="/include/footer.jsp"></jsp:include>
 </body>

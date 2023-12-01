@@ -48,6 +48,36 @@ public class PlaceDao {
 			return false;
 		}
 	}
+	
+	public boolean insert2(PlaceDto dto) {
+		Connection conn=null;
+		PreparedStatement pstmt=null;
+		int rowCount=0;
+		try {
+			conn=new DbcpBean().getConn();
+			String sql="INSERT INTO DELLIST"
+					+ " (num, name, addr, score)"
+					+ " VALUES(?, ?, ?, ?)";
+			pstmt=conn.prepareStatement(sql);
+			pstmt.setInt(1, dto.getNum());
+			pstmt.setString(2, dto.getName());
+			pstmt.setString(3, dto.getAddr());
+			pstmt.setInt(4, dto.getScore());
+			rowCount=pstmt.executeUpdate();
+		}catch(Exception e) {
+			e.printStackTrace();
+		}finally {
+			try {
+				if(pstmt!=null)pstmt.close();
+				if(conn!=null)conn.close();
+			}catch(Exception e) {}
+		}
+		if(rowCount>0) {
+			return true;
+		}else {
+			return false;
+		}
+	}
 	//회원 정보 수정 리턴하는 메소드
 	public boolean update(PlaceDto dto) {
 		Connection conn = null;
@@ -57,14 +87,15 @@ public class PlaceDao {
 			conn = new DbcpBean().getConn();
 			//실행할 sql 문
 			String sql = "UPDATE placelist"
-					+ " SET name=?, addr=? score=? "
+					+ " SET num =?,name=?, addr=?, score=? "
 					+ " WHERE num = ?";
 			pstmt = conn.prepareStatement(sql);
 			//? 에 바인딩 할 내용이 있으면 바인딩
-			pstmt.setString(1, dto.getName());
-			pstmt.setString(2, dto.getAddr());
-			pstmt.setInt(3, dto.getScore());
-			pstmt.setInt(4, dto.getNum());
+			pstmt.setInt(1, dto.getNum());
+			pstmt.setString(2, dto.getName());
+			pstmt.setString(3, dto.getAddr());
+			pstmt.setInt(4, dto.getScore());
+			pstmt.setInt(5, dto.getNum());
 			rowCount = pstmt.executeUpdate();
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -92,7 +123,38 @@ public class PlaceDao {
 		try {
 			conn = new DbcpBean().getConn();
 			//실행할 sql 문
-			String sql = "DELETE FROM member"
+			String sql = "DELETE FROM placelist "
+					+ " WHERE num=?";
+			pstmt = conn.prepareStatement(sql);
+			//? 에 바인딩 할 내용이 있으면 바인딩
+			pstmt.setInt(1, num);
+			rowCount = pstmt.executeUpdate();
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (pstmt != null)
+					pstmt.close();
+				if (conn != null)
+					conn.close();
+			} catch (Exception e) {
+			}
+		}
+		if (rowCount > 0) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
+	public boolean delete2(int num) {
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		int rowCount = 0;
+		try {
+			conn = new DbcpBean().getConn();
+			//실행할 sql 문
+			String sql = "DELETE FROM DELLIST"
 					+ " WHERE num=?";
 			pstmt = conn.prepareStatement(sql);
 			//? 에 바인딩 할 내용이 있으면 바인딩
@@ -125,8 +187,8 @@ public class PlaceDao {
 		try {
 			conn = new DbcpBean().getConn();
 			//실행할 sql 문
-			String sql = "SELECT name,addr,score"
-					+ " FROM member"
+			String sql = "SELECT num,name,addr,score"
+					+ " FROM placelist"
 					+ " WHERE num =?";
 			pstmt = conn.prepareStatement(sql);
 			//? 에 바인딩할 내용이 있으면 여기서 한다.
@@ -136,7 +198,7 @@ public class PlaceDao {
 			//반복문 돌면서 
 			while (rs.next()) {
 				dto =new PlaceDto();
-				dto.setNum(num);
+				dto.setNum(rs.getInt("num"));
 				dto.setName(rs.getString("name"));
 				dto.setAddr(rs.getString("addr"));
 				dto.setScore(rs.getInt("score"));
@@ -157,6 +219,47 @@ public class PlaceDao {
 		return dto;
 	}
 	
+	//회원 목록을 리턴해주는 메소드 
+	public List<PlaceDto> getList2(){
+		
+		List<PlaceDto> list=new ArrayList<>();
+
+		Connection conn=null;
+		PreparedStatement pstmt=null;
+		ResultSet rs=null;
+		try{
+			//DbcpBean() 객체를 이용해서 Connection 객체 하나 얻어내기 (Connection Pool 에서 하나 꺼내오기)
+			conn=new DbcpBean().getConn();
+			//실행할 sql 문
+			String sql="SELECT num, name, addr ,score"+
+			 	" FROM DELLIST"+
+				" ORDER BY score DESC";
+			pstmt=conn.prepareStatement(sql);
+			//query 문 수행하고 결과(ResultSet) 얻어내기
+			rs=pstmt.executeQuery();
+			//반복문 돌면서 
+			while(rs.next()){
+				//MemberDto 객체에 회원 한명, 한명의 정보를 담아서
+				PlaceDto dto=new PlaceDto();
+				dto.setNum(rs.getInt("num"));
+				dto.setName(rs.getString("name"));
+				dto.setAddr(rs.getString("addr"));
+				dto.setScore(rs.getInt("score"));
+				//ArrayList 객체에 누적 시킨다.
+				list.add(dto);
+			}
+		}catch(Exception e){
+			e.printStackTrace();
+		}finally{
+			try{
+				if(rs!=null)rs.close();
+				if(pstmt!=null)pstmt.close();
+				if(conn!=null)conn.close(); //Connection 객체의 close() 메소드를 호출하면 Pool 에 반납된다.
+			}catch(Exception e){}
+		}
+		return list;
+	}
+
 	
 	//회원 목록을 리턴해주는 메소드 
 	public List<PlaceDto> getList(){
@@ -172,7 +275,7 @@ public class PlaceDao {
 			//실행할 sql 문
 			String sql="SELECT num, name, addr ,score"+
 			 	" FROM placelist"+
-				" ORDER BY num ASC";
+				" ORDER BY score DESC";
 			pstmt=conn.prepareStatement(sql);
 			//query 문 수행하고 결과(ResultSet) 얻어내기
 			rs=pstmt.executeQuery();
@@ -199,5 +302,6 @@ public class PlaceDao {
 		return list;
 	}
 }
+	
 
 

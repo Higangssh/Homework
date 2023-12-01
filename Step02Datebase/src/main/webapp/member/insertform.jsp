@@ -21,7 +21,7 @@
 		<form action="${pageContext.request.contextPath}/member/insert.jsp" method="post">
 			<div class="mb-2">
 				<label class="form-label" for="name">이름</label>
-				<input class="form-control" type="text" name="name" id="name"/>
+				<input class="form-control" type="text" name="name" id="name" />
 			</div>		
 			<div class="mb-2">
 				<label class="form-label" for="addr">주소</label>
